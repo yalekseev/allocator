@@ -5,6 +5,8 @@
 #include <limits>
 #include <new>
 
+namespace util {
+
 template <std::size_t BLOCK_SIZE>
 class AdjecentFixedSizeBlocksAllocator {
 private:
@@ -62,8 +64,14 @@ public:
         }
     }
 
+    bool full() {
+        return (0 == m_free_blocks);
+    }
+
 private:
     unsigned char *m_start;
     unsigned char m_free_head;
     unsigned char m_free_blocks;
 };
+
+} // namespace util
