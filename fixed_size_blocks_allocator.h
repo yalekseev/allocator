@@ -9,13 +9,12 @@
 
 namespace util {
 
-template <std::size_t BLOCK_SIZE>
 class FixedSizeBlocksAllocator {
 private:
-    typedef AdjecentFixedSizeBlocksAllocator<BLOCK_SIZE> Allocator;
+    typedef AdjecentFixedSizeBlocksAllocator Allocator;
 
 public:
-    FixedSizeBlocksAllocator() : m_try_this_allocator(0) { }
+    explicit FixedSizeBlocksAllocator(std::size_t block_size) : m_block_size(block_size), m_try_this_allocator(0) { }
 
     void * alloc() {
         // Try a pointed allocator first
@@ -33,7 +32,7 @@ public:
 
         // No allocators with free blocks, create a new one
         Allocator new_allocator;
-        new_allocator.init();
+        new_allocator.init(m_block_size);
 
         // Find a place for the new allocator and insert it
         auto it = std::lower_bound(
@@ -65,6 +64,7 @@ public:
     }
 
 private:
+    std::size_t m_block_size;
     Allocator *m_try_this_allocator;
     std::vector<Allocator, impl::StdAllocator<Allocator> > m_allocators;
 };
