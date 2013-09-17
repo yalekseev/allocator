@@ -78,7 +78,7 @@ public:
     Allocator() {
         m_allocators.reserve(65);
         for (int i = 0; i < 65; ++i) {
-            m_allocators.push_back(std::move(FixedAllocatorHandle(i)));
+            m_allocators.push_back(FixedAllocatorHandle(i));
         }
     }
 
