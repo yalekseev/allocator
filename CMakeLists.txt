@@ -1,0 +1,7 @@
+cmake_minimum_required (VERSION 2.6)
+project (allocator)
+set (CMAKE_CXX_COMPILER "g++")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++0x")
+find_package (Threads)
+add_executable(allocator allocator.cpp)
+target_link_libraries (allocator ${CMAKE_THREAD_LIBS_INIT})

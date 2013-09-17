@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdlib>
+#include <utility>
 
 namespace util {
 
@@ -12,8 +13,8 @@ public:
     typedef T value_type;
     typedef value_type *pointer;
     typedef const value_type *const_pointer;
-    typedef value_type &reference;
-    typedef const value_type &const_reference;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
@@ -32,6 +33,10 @@ public:
 
     void construct(pointer p, const T& t) const {
         new (p) T(t);
+    }
+
+    void construct(pointer p, T&& t) const {
+        new (p) T(std::forward<T>(t));
     }
 
     void destroy(pointer p) const {
