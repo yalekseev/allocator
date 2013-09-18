@@ -14,16 +14,21 @@ public:
     typedef std::size_t size_type;
 
 private:
+    // Blocks of greater size are served by the global allocator
+    enum { MY_MAX_SIZE = 64 };
+
     class FixedAllocatorHandle {
     public:
         explicit FixedAllocatorHandle(std::size_t block_size = 0)
             : m_block_size(block_size)
             , m_allocator(0) { }
 
+        // Forbid copy construction
         FixedAllocatorHandle(const FixedAllocatorHandle& other) = delete;
 
         FixedAllocatorHandle(FixedAllocatorHandle&& other);
 
+        // Forbid copy assignment
         FixedAllocatorHandle& operator=(const FixedAllocatorHandle& other) = delete;
 
         FixedAllocatorHandle& operator=(FixedAllocatorHandle&& other);

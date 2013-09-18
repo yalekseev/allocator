@@ -3,7 +3,7 @@
 int main() {
     util::Allocator allocator;
 
-    for (int size = 1; size < 65; ++size) {
+    for (int size = 1; size < 1024; ++size) {
         void *p = allocator.alloc(size);
         allocator.free(p, size);
     }

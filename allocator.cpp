@@ -64,9 +64,10 @@ void Allocator::FixedAllocatorHandle::swap(Allocator::FixedAllocatorHandle& othe
 /* Allocator */
 
 Allocator::Allocator() {
-    m_allocators.reserve(65);
-    for (int i = 0; i < 65; ++i) {
-        m_allocators.push_back(FixedAllocatorHandle(i));
+    // Allocate fixed allocator handle for each block size in the range 0..MY_MAX_SIZE
+    m_allocators.reserve(MY_MAX_SIZE + 1);
+    for (std::size_t block_size = 0; block_size < MY_MAX_SIZE + 1; ++block_size) {
+        m_allocators.push_back(FixedAllocatorHandle(block_size));
     }
 }
 
