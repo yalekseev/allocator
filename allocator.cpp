@@ -1,8 +1,6 @@
 #include "fixed_size_blocks_allocator.h"
-#include "std_allocator.h"
 #include "allocator.h"
 
-#include <algorithm>
 #include <stdexcept>
 #include <cstdlib>
 #include <utility>
@@ -34,7 +32,7 @@ void * Allocator::FixedAllocatorHandle::alloc() {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     if (0 == m_allocator) {
-        m_allocator = static_cast<FixedSizeBlocksAllocator *>(::malloc(sizeof(FixedSizeBlocksAllocator)));
+        m_allocator = static_cast<FixedSizeBlocksAllocator *>(std::malloc(sizeof(FixedSizeBlocksAllocator)));
         if (0 == m_allocator) {
             throw std::bad_alloc();
         }
@@ -73,7 +71,7 @@ Allocator::Allocator() {
 
 void * Allocator::alloc(size_type size) {
     if (m_allocators.size() <= size) {
-        return ::malloc(size);
+        return std::malloc(size);
     }
 
     return m_allocators[size].alloc();
@@ -81,7 +79,7 @@ void * Allocator::alloc(size_type size) {
 
 void Allocator::free(void *p, size_type size) {
     if (m_allocators.size() <= size) {
-        ::free(p);
+        std::free(p);
         return;
     }
 
