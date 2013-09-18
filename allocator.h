@@ -7,7 +7,6 @@
 #include <utility>
 #include <vector>
 #include <mutex>
-#include <new>
 
 namespace util {
 
@@ -22,51 +21,19 @@ private:
 
         FixedAllocatorHandle(const FixedAllocatorHandle& other) = delete;
 
-        FixedAllocatorHandle(FixedAllocatorHandle&& other) {
-            m_block_size = other.m_block_size;
-            m_ptr = other.m_ptr;
-            other.m_block_size = 0;
-            other.m_ptr = 0;
-        }
+        FixedAllocatorHandle(FixedAllocatorHandle&& other);
 
         FixedAllocatorHandle& operator=(const FixedAllocatorHandle& other) = delete;
 
-        FixedAllocatorHandle& operator=(FixedAllocatorHandle&& other) {
-            FixedAllocatorHandle tmp(std::forward<FixedAllocatorHandle>(other));
-            swap(tmp);
-            return *this;
-        }
+        FixedAllocatorHandle& operator=(FixedAllocatorHandle&& other);
 
-        ~FixedAllocatorHandle() {
-            delete m_ptr;
-        }
+        ~FixedAllocatorHandle();
 
-        void * alloc() {
-            std::lock_guard<std::mutex> lock(m_mutex);
+        void * alloc();
 
-            if (0 == m_ptr) {
-                m_ptr = static_cast<FixedSizeBlocksAllocator *>(::malloc(sizeof(FixedSizeBlocksAllocator)));
-                if (0 == m_ptr) {
-                    throw std::bad_alloc();
-                }
+        void free(void *p);
 
-                new (m_ptr) FixedSizeBlocksAllocator(m_block_size);
-            }
-
-            return m_ptr->alloc();
-        }
-
-        void free(void *p) {
-            std::lock_guard<std::mutex> lock(m_mutex);
-
-            assert (0 != m_ptr);
-            m_ptr->free(p);
-        }
-
-        void swap(FixedAllocatorHandle& other) {
-            std::swap(m_block_size, other.m_block_size);
-            std::swap(m_ptr, other.m_ptr);
-        }
+        void swap(FixedAllocatorHandle& other);
 
     private:
         std::mutex m_mutex;
@@ -75,29 +42,24 @@ private:
     };
 
 public:
-    Allocator() {
-        m_allocators.reserve(65);
-        for (int i = 0; i < 65; ++i) {
-            m_allocators.push_back(FixedAllocatorHandle(i));
-        }
-    }
+    Allocator();
 
-    void * alloc(size_type size) {
-        if (m_allocators.size() <= size) {
-            return ::malloc(size);
-        }
+    // Forbid copy construction
+    Allocator(const Allocator& other) = delete;
 
-        return m_allocators[size].alloc();
-    }
+    Allocator(Allocator&& other);
 
-    void free(void *p, size_type size) {
-        if (m_allocators.size() <= size) {
-            ::free(p);
-            return;
-        }
+    // Forbid copy assignment
+    Allocator& operator=(const Allocator& other) = delete;
 
-        m_allocators[size].free(p);
-    }
+    Allocator& operator=(Allocator&& other);
+
+    // Use copmiler generated destructor
+    ~Allocator() = default;
+
+    void * alloc(size_type size);
+
+    void free(void *p, size_type size);
 
 private:
     std::vector<FixedAllocatorHandle, impl::StdAllocator<FixedAllocatorHandle> > m_allocators;
