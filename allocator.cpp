@@ -15,9 +15,9 @@ namespace util {
 
 Allocator::FixedAllocatorHandle::FixedAllocatorHandle(FixedAllocatorHandle&& other) {
     m_block_size = other.m_block_size;
-    m_ptr = other.m_ptr;
+    m_allocator = other.m_allocator;
     other.m_block_size = 0;
-    other.m_ptr = 0;
+    other.m_allocator = 0;
 }
 
 Allocator::FixedAllocatorHandle& Allocator::FixedAllocatorHandle::operator=(Allocator::FixedAllocatorHandle&& other) {
@@ -27,38 +27,38 @@ Allocator::FixedAllocatorHandle& Allocator::FixedAllocatorHandle::operator=(Allo
 }
 
 Allocator::FixedAllocatorHandle::~FixedAllocatorHandle() {
-    delete m_ptr;
+    delete m_allocator;
 }
 
 void * Allocator::FixedAllocatorHandle::alloc() {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    if (0 == m_ptr) {
-        m_ptr = static_cast<FixedSizeBlocksAllocator *>(::malloc(sizeof(FixedSizeBlocksAllocator)));
-        if (0 == m_ptr) {
+    if (0 == m_allocator) {
+        m_allocator = static_cast<FixedSizeBlocksAllocator *>(::malloc(sizeof(FixedSizeBlocksAllocator)));
+        if (0 == m_allocator) {
             throw std::bad_alloc();
         }
 
         // Construct new allocator
-        new (m_ptr) FixedSizeBlocksAllocator(m_block_size);
+        new (m_allocator) FixedSizeBlocksAllocator(m_block_size);
     }
 
-    return m_ptr->alloc();
+    return m_allocator->alloc();
 }
 
 void Allocator::FixedAllocatorHandle::free(void *p) {
     std::lock_guard<std::mutex> lock(m_mutex);
 
-    if (0 == m_ptr) {
+    if (0 == m_allocator) {
         throw std::logic_error("Trying to free block to not yet created allocator.");
     }
 
-    m_ptr->free(p);
+    m_allocator->free(p);
 }
 
 void Allocator::FixedAllocatorHandle::swap(Allocator::FixedAllocatorHandle& other) {
     std::swap(m_block_size, other.m_block_size);
-    std::swap(m_ptr, other.m_ptr);
+    std::swap(m_allocator, other.m_allocator);
 }
 
 /* Allocator */

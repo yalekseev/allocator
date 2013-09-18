@@ -16,7 +16,9 @@ public:
 private:
     class FixedAllocatorHandle {
     public:
-        explicit FixedAllocatorHandle(std::size_t block_size = 0) : m_block_size(block_size), m_ptr(0) { }
+        explicit FixedAllocatorHandle(std::size_t block_size = 0)
+            : m_block_size(block_size)
+            , m_allocator(0) { }
 
         FixedAllocatorHandle(const FixedAllocatorHandle& other) = delete;
 
@@ -37,7 +39,7 @@ private:
     private:
         std::mutex m_mutex;
         std::size_t m_block_size;
-        FixedSizeBlocksAllocator *m_ptr;
+        FixedSizeBlocksAllocator *m_allocator;
     };
 
 public:
