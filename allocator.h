@@ -1,14 +1,13 @@
 #pragma once
 
-#include "fixed_size_blocks_allocator.h"
 #include "std_allocator.h"
 
-#include <stdexcept>
-#include <utility>
 #include <vector>
 #include <mutex>
 
 namespace util {
+
+class FixedSizeBlocksAllocator;
 
 class Allocator {
 public:

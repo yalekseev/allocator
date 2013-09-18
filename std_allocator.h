@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <utility>
+#include <limits>
 
 namespace util {
 
