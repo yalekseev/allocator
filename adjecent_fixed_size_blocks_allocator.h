@@ -9,6 +9,22 @@ private:
     enum { NUM_BLOCKS = std::numeric_limits<unsigned char>::max() };
 
 public:
+    // Forbid defult constructor
+    AdjecentFixedSizeBlocksAllocator() = delete;
+
+    explicit AdjecentFixedSizeBlocksAllocator(std::size_t block_size);
+
+    // Forbid copy construction
+    AdjecentFixedSizeBlocksAllocator(const AdjecentFixedSizeBlocksAllocator& other) = delete;
+    // Allow move construction
+    AdjecentFixedSizeBlocksAllocator(AdjecentFixedSizeBlocksAllocator&& other);
+    // Forbid copy assignment
+    AdjecentFixedSizeBlocksAllocator& operator=(const AdjecentFixedSizeBlocksAllocator& other) = delete;
+    // Allow move assignment
+    AdjecentFixedSizeBlocksAllocator& operator=(AdjecentFixedSizeBlocksAllocator&& other);
+
+    ~AdjecentFixedSizeBlocksAllocator();
+
     void * alloc();
 
     void free(void *p);
@@ -21,7 +37,7 @@ public:
 
     void * end() const;
 
-    void init(std::size_t block_size);
+    void swap(AdjecentFixedSizeBlocksAllocator& other);
 
 private:
     unsigned char *m_start;

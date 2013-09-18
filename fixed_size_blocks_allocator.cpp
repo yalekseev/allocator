@@ -20,8 +20,7 @@ void * FixedSizeBlocksAllocator::alloc() {
     }
 
     // No allocators with free blocks, create a new one
-    Allocator new_allocator;
-    new_allocator.init(m_block_size);
+    Allocator new_allocator(m_block_size);
 
     // Find a place for the new allocator and insert it
     auto it = std::lower_bound(
@@ -30,7 +29,7 @@ void * FixedSizeBlocksAllocator::alloc() {
         new_allocator,
         [](const Allocator &left, const Allocator &right){ return left.begin() < right.begin(); });
 
-    auto new_it = m_allocators.insert(it, new_allocator);
+    auto new_it = m_allocators.insert(it, std::move(new_allocator));
     m_try_this_allocator = &(*new_it);
     return m_try_this_allocator->alloc();
 }
