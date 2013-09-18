@@ -12,6 +12,8 @@ namespace util {
 /* Allocator::FixedAllocatorHandle */
 
 Allocator::FixedAllocatorHandle::FixedAllocatorHandle(FixedAllocatorHandle&& other) {
+    std::lock_guard<std::mutex> lock(other.m_mutex);
+
     m_block_size = other.m_block_size;
     m_allocator = other.m_allocator;
     other.m_block_size = 0;
