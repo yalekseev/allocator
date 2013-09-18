@@ -25,12 +25,11 @@ private:
 
         // Forbid copy construction
         FixedAllocatorHandle(const FixedAllocatorHandle& other) = delete;
-
+        // Allow move construction
         FixedAllocatorHandle(FixedAllocatorHandle&& other);
-
         // Forbid copy assignment
         FixedAllocatorHandle& operator=(const FixedAllocatorHandle& other) = delete;
-
+        // Allow move assignment
         FixedAllocatorHandle& operator=(FixedAllocatorHandle&& other);
 
         ~FixedAllocatorHandle();
@@ -48,23 +47,22 @@ private:
     };
 
 public:
+    // Allow default construction
     Allocator();
-
     // Forbid copy construction
     Allocator(const Allocator& other) = delete;
-
+    // Allow move construction
     Allocator(Allocator&& other);
-
     // Forbid copy assignment
     Allocator& operator=(const Allocator& other) = delete;
-
+    // Allow move assignment;
     Allocator& operator=(Allocator&& other);
-
-    // Use copmiler generated destructor
+    // Use compiler generated destructor
     ~Allocator() = default;
 
+    /*! Allocate memory block from the free pool. */
     void * alloc(size_type size);
-
+    /*! Return memory block to the free pool.*/
     void free(void *p, size_type size);
 
 private:
